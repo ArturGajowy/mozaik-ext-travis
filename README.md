@@ -37,6 +37,31 @@ key          | required | description
 }
 ```
 
+### Travis Build Status
+
+![travis build status](https://raw.githubusercontent.com/plouc/mozaik-ext-travis/master/preview/travis.build_status.png)
+
+> Display travis repo infos
+
+#### parameters
+
+key          | required | description
+-------------|----------|---------------
+`owner`      | yes      | *repo owner*
+`repository` | yes      | *repo name*
+`branch`     | no       | *branch (default: master)*
+`title`      | no       | *title (default: $owner / $repository / $branch)*
+
+#### usage
+
+```javascript
+{
+  type: 'travis.build_status',
+  owner: 'plouc', repository: 'mozaik', branch: 'master'
+  columns: 1, rows: 1, x: 0, y: 0
+}
+```
+
 
 
 ### Travis Build history

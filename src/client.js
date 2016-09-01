@@ -37,6 +37,46 @@ const client = mozaik => {
 
             return def.promise;
         },
+        /**
+         * Fetch latest build status.
+         *
+         * @param {object} params
+         * @param {string} params.owner
+         * @param {string} params.repository
+         * @param {string} params.branch
+         * @returns {Promise}
+         */
+        buildStatus({ owner, repository, branch }) {
+            const def = Promise.defer();
+
+            mozaik.logger.info(chalk.yellow(`[travis] calling buildStatus: ${owner}/${repository} branch ${branch}`));
+
+            travis.repos(owner, repository).branches(branch).get((err, res) => {
+                if (err) {
+                    def.reject(err);
+                }
+                const build = res.branch;
+                const buildStatus = (state) => {
+                    switch (state) {
+                        case 'created' : return 'BUILDING';
+                        case 'started' : return 'BUILDING';
+                        case 'passed'  : return 'SUCCESS';
+                        case 'failed'  : return 'FAILURE';
+                        case 'errored' : return 'FAILURE';
+                        case 'canceled': return 'ABORTED';
+                        default        : return 'UNKNOWN';
+                    }
+                };
+                def.resolve({
+                    id          : build.id,
+                    number      : build.number,
+                    status      : buildStatus(build.state),
+                    timestamp   : build.finished_at || build.started_at
+                });
+            });
+
+            return def.promise;
+        },
 
         /**
          * Fetch repository build history.
