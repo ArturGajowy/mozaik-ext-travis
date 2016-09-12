@@ -58,20 +58,39 @@ const client = mozaik => {
                 const build = res.branch;
                 const buildStatus = (state) => {
                     switch (state) {
-                        case 'created' : return 'BUILDING';
-                        case 'started' : return 'BUILDING';
-                        case 'passed'  : return 'SUCCESS';
-                        case 'failed'  : return 'FAILURE';
-                        case 'errored' : return 'FAILURE';
-                        case 'canceled': return 'ABORTED';
-                        default        : return 'UNKNOWN';
+                        case 'created' : return 'building';
+                        case 'started' : return 'building';
+                        case 'passed'  : return 'success';
+                        case 'failed'  : return 'failure';
+                        case 'errored' : return 'failure';
+                        case 'canceled': return 'aborted';
+                        default        : return 'unknown';
                     }
                 };
-                def.resolve({
-                    id          : build.id,
-                    number      : build.number,
-                    status      : buildStatus(build.state),
-                    timestamp   : build.finished_at || build.started_at
+                travis.repos(owner, repository).builds.get((err, res) => {
+                    if (err) {
+                        def.reject(err);
+                    }
+
+                    res.builds.forEach(build => {
+                        const commit = _.find(res.commits, { id: build.commit_id });
+                        if (commit) {
+                            build.commit = commit;
+                        }
+                    });
+                    const previousBuild = _.find(res.builds, (b) => {
+                        return b.commit.branch == branch && (b.state == 'passed' || b.state == 'failed' || b.state == 'errored');
+                    }) || {
+                        state: 'not_found'
+                    };
+
+                    def.resolve({
+                        id             : build.id,
+                        number         : build.number,
+                        status         : buildStatus(build.state),
+                        previous_status: buildStatus(previousBuild.state),
+                        timestamp      : build.finished_at || build.started_at
+                    });
                 });
             });
 

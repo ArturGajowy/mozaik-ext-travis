@@ -39,7 +39,9 @@ class BuildStatus extends Component {
                 iconClasses = 'fa fa-check';
             }
 
-            statusClasses = `widget__body__colored travis__view__build__colored_status--${ build.status.toLowerCase() }`;
+            statusClasses = 'widget__body__colored ' +
+                `travis__view__build__colored_status--${ build.status } ` +
+                `travis__view__build__colored_status__previous--${ build.previous_status }`;
             const buildUrl = `https://travis-ci.org/${owner}/${repository}/builds/${build.id}`;
 
             widgetBody = (
