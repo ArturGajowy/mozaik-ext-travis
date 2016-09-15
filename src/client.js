@@ -29,7 +29,7 @@ const client = mozaik => {
 
             travis.repos(owner, repository).get((err, res) => {
                 if (err) {
-                    def.reject(err);
+                    return def.reject(err);
                 }
 
                 def.resolve(res.repo);
@@ -53,7 +53,7 @@ const client = mozaik => {
 
             travis.repos(owner, repository).branches(branch).get((err, res) => {
                 if (err) {
-                    def.reject(err);
+                    return def.reject(err);
                 }
                 const build = res.branch;
                 const buildStatus = (state) => {
@@ -69,7 +69,7 @@ const client = mozaik => {
                 };
                 travis.repos(owner, repository).builds.get((err, res) => {
                     if (err) {
-                        def.reject(err);
+                        return def.reject(err);
                     }
 
                     res.builds.forEach(build => {
