@@ -72,6 +72,10 @@ const client = mozaik => {
                         return def.reject(err);
                     }
 
+                    if (Array.isArray(res.builds)) {
+                        return def.reject("Malformed response from Travis - no 'builds' in response JSON");
+                    }
+
                     res.builds.forEach(build => {
                         const commit = _.find(res.commits, { id: build.commit_id });
                         if (commit) {
@@ -112,7 +116,11 @@ const client = mozaik => {
 
             travis.repos(owner, repository).builds.get((err, res) => {
                 if (err) {
-                    def.reject(err);
+                    return def.reject(err);
+                }
+
+                if (Array.isArray(res.builds)) {
+                    return def.reject("Malformed response from Travis - no 'builds' in response JSON");
                 }
 
                 res.builds.forEach(build => {
